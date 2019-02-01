@@ -1,0 +1,12 @@
+This project is implemented using JavaScript, HTML, CSS and webpack
+
+To run the application:
+-Clone it to your local repository.:
+git clone https://github.com/shreyasawant1506/Flickr-API-.git
+
+-Go into the project root folder:
+cd Flickr-API-/
+
+-Run commands:
+npm install
+npm start
