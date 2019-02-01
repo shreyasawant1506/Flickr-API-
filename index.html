@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flickr API</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<script>
+
+    function showModal(src){
+        var modal = document.getElementById('myModal');
+        var img = document.getElementById('modalImage').setAttribute("src", src)
+        modal.style.display = "block";
+    }
+
+    function closeModal(){
+        var modal = document.getElementById('myModal');
+        modal.style.display = "none";
+    }
+
+    var data = new XMLHttpRequest();
+    data.open('GET', "https://api.flickr.com/services/rest/?method=flickr.galleries.getPhotos&api_key=f7560488accbe57518236daa16323492&gallery_id=72157703406532791&per_page=10&format=json&nojsoncallback=1");
+    data.send(null);
+    data.onload = function () {
+        if (data.status >= 200 && data.status < 300) {
+            generateOutput(data.response)
+        } else {
+            console.log('The request failed!');
+        }
+    };
+
+    function generateOutput(data){
+        var data = JSON.parse(data);
+        var numOfObjects = data.photos.photo.length
+        for (var i = 0; i < Math.floor(numOfObjects/10); i++) {
+            switch(i){
+                case 0:
+                    parent = document.getElementById("pages")
+                    child = document.createElement('li');
+                    child.className = "nav-item"
+                    child.innerHTML = '<a class="nav-link active" data-toggle="pill" href="#page'+i+'">'+(i+1)+'</a>'
+                    parent.appendChild(child)
+
+                    parent = document.getElementById("tabContent")
+                    child = document.createElement('div');
+                    child.setAttribute("id", "page"+i);
+                    child.className = "tab-pane active"
+                    child.innerHTML = '<div class="row" id="pages'+i+'"></div>'
+                    parent.appendChild(child)
+                    break
+
+                default:
+
+                    parent = document.getElementById("pages")
+                    child = document.createElement('li');
+                    child.className = "nav-item"
+                    child.innerHTML = '<a class="nav-link" data-toggle="pill" href="#page'+i+'">'+(i+1)+'</a>'
+                    parent.appendChild(child)
+
+                    parent = document.getElementById("tabContent")
+                    child = document.createElement('div');
+                    child.setAttribute("id", "page"+i);
+                    child.className = "tab-pane fade in"
+                    child.innerHTML = '<div class="row" id="pages'+i+'"></div>'
+                    parent.appendChild(child)
+                    break
+            }
+        }
+        var count = 0
+        var pageCount = 0
+        for (var i = 0; i < numOfObjects; i++) {
+            var farmId = data.photos.photo[i].farm;
+            var serverId = data.photos.photo[i].server;
+            var id = data.photos.photo[i].id;
+            var secret = data.photos.photo[i].secret;
+            var src = 'https://farm' + farmId + '.staticflickr.com/' + serverId + '/' + id + '_' + secret + '.jpg'
+            if (count < 10) {
+                parent = document.getElementById('pages'+pageCount)
+                child = document.createElement('div');
+                child.className = "col-md-3"
+                child.innerHTML = '<div class="containerImages" id="gridImage" style = "background-image:url('+src+')"  onclick=showModal("'+src+'")></div>'
+                parent.appendChild(child)
+                count++
+            }
+            else{
+                count=0
+                pageCount++
+            }
+        }
+    }
+
+</script>
+<h2><div id="galleryTitle">Photo Gallery</div></h2>
+<ul class="nav nav-pills" id="pages">
+
+</ul>
+
+<div class="tab-content" id="tabContent">
+
+</div>
+
+
+<div id="myModal" class="modal">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <img class="modal-content" id="modalImage">
+    <div id="caption"></div>
+</div>
+
+</body>
+</html>
